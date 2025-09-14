@@ -2,7 +2,7 @@
 // Source: C:\Users\Onton\route256\internal\model\incoming_msg.go
 
 // Package mock is a generated GoMock package.
-package mock_msg
+package mock
 
 import (
 	reflect "reflect"
@@ -34,7 +34,7 @@ func (m *MockMessageSender) EXPECT() *MockMessageSenderMockRecorder {
 }
 
 // SendMessage mocks base method.
-func (m *MockMessageSender) SendMessage(message string, userId int) error {
+func (m *MockMessageSender) SendMessage(message string, userId int64) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "SendMessage", message, userId)
 	ret0, _ := ret[0].(error)

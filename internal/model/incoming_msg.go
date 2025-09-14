@@ -1,7 +1,7 @@
-package model
+package messages
 
 type MessageSender interface {
-	SendMessage(message string, userId int) error
+	SendMessage(message string, userId int64) error
 }
 
 type Model struct {
@@ -15,12 +15,12 @@ func New(tgClient MessageSender) *Model {
 }
 
 type Message struct {
-	TextCommand string
-	UserId      int
+	Text   string
+	UserId int64
 }
 
 func (s *Model) IncommingMessage(msg Message) error {
-	if msg.TextCommand == "/start" {
+	if msg.Text == "/start" {
 		s.tgClient.SendMessage("Привет", msg.UserId)
 		return nil
 	}
