@@ -4,7 +4,7 @@ import (
 	"log"
 	"route256/config"
 	"route256/internal/clients/tg"
-	messages "route256/internal/model"
+	"route256/internal/model/messages"
 )
 
 func main() {
