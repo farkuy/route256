@@ -34,7 +34,7 @@ func (c *Client) SendMessage(message string, userId int64) error {
 	return nil
 }
 
-func (c *Client) Updates(msgModel *messages.Model) {
+func (c *Client) ListenUpdates(msgModel *messages.Model) {
 	u := tgbotapi.NewUpdate(0)
 	u.Timeout = 60
 
