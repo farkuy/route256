@@ -6,36 +6,52 @@ package mock
 
 import (
 	reflect "reflect"
+	spending "route256/internal/model/spending"
 	time "time"
 
 	gomock "github.com/golang/mock/gomock"
 )
 
-// MockSpendingSpender is a mock of SpendingSpender interface.
-type MockSpendingSpender struct {
+// MockSpendingAction is a mock of SpendingAction interface.
+type MockSpendingAction struct {
 	ctrl     *gomock.Controller
-	recorder *MockSpendingSpenderMockRecorder
+	recorder *MockSpendingActionMockRecorder
 }
 
-// MockSpendingSpenderMockRecorder is the mock recorder for MockSpendingSpender.
-type MockSpendingSpenderMockRecorder struct {
-	mock *MockSpendingSpender
+// MockSpendingActionMockRecorder is the mock recorder for MockSpendingAction.
+type MockSpendingActionMockRecorder struct {
+	mock *MockSpendingAction
 }
 
-// NewMockSpendingSpender creates a new mock instance.
-func NewMockSpendingSpender(ctrl *gomock.Controller) *MockSpendingSpender {
-	mock := &MockSpendingSpender{ctrl: ctrl}
-	mock.recorder = &MockSpendingSpenderMockRecorder{mock}
+// NewMockSpendingAction creates a new mock instance.
+func NewMockSpendingAction(ctrl *gomock.Controller) *MockSpendingAction {
+	mock := &MockSpendingAction{ctrl: ctrl}
+	mock.recorder = &MockSpendingActionMockRecorder{mock}
 	return mock
 }
 
 // EXPECT returns an object that allows the caller to indicate expected use.
-func (m *MockSpendingSpender) EXPECT() *MockSpendingSpenderMockRecorder {
+func (m *MockSpendingAction) EXPECT() *MockSpendingActionMockRecorder {
 	return m.recorder
 }
 
+// GetUserSpendingHistory mocks base method.
+func (m *MockSpendingAction) GetUserSpendingHistory(userId int64) (*[]spending.Spending, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetUserSpendingHistory", userId)
+	ret0, _ := ret[0].(*[]spending.Spending)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetUserSpendingHistory indicates an expected call of GetUserSpendingHistory.
+func (mr *MockSpendingActionMockRecorder) GetUserSpendingHistory(userId interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUserSpendingHistory", reflect.TypeOf((*MockSpendingAction)(nil).GetUserSpendingHistory), userId)
+}
+
 // SendSpending mocks base method.
-func (m *MockSpendingSpender) SendSpending(userId, sum int64, spendingType string, date time.Time) error {
+func (m *MockSpendingAction) SendSpending(userId, sum int64, spendingType string, date time.Time) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "SendSpending", userId, sum, spendingType, date)
 	ret0, _ := ret[0].(error)
@@ -43,7 +59,7 @@ func (m *MockSpendingSpender) SendSpending(userId, sum int64, spendingType strin
 }
 
 // SendSpending indicates an expected call of SendSpending.
-func (mr *MockSpendingSpenderMockRecorder) SendSpending(userId, sum, spendingType, date interface{}) *gomock.Call {
+func (mr *MockSpendingActionMockRecorder) SendSpending(userId, sum, spendingType, date interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SendSpending", reflect.TypeOf((*MockSpendingSpender)(nil).SendSpending), userId, sum, spendingType, date)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SendSpending", reflect.TypeOf((*MockSpendingAction)(nil).SendSpending), userId, sum, spendingType, date)
 }

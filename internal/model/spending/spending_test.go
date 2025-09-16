@@ -18,7 +18,7 @@ func Test_SendSpender_Success(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	modelMock := mock_spending.NewMockSpendingSpender(ctrl)
+	modelMock := mock_spending.NewMockSpendingAction(ctrl)
 	model := New(modelMock)
 
 	parsedTime, err := time.Parse(layout, dateString)
