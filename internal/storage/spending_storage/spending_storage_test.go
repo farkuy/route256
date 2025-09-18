@@ -37,22 +37,48 @@ func Test_SpendingStore_Add_NewSpending_Date_After_DateNow(t *testing.T) {
 	assert.Error(t, err)
 }
 
-func Test_GetUserSpendingHistory_Base_Get_SUCCESS(t *testing.T) {
+func Test_GetUserSpendingHistory_Base_Get_Week(t *testing.T) {
 	model := New()
-	model.SendSpending(userId, 12000, "еда", timeNow)
+	model.SendSpending(userId, 1, "еда", timeNow)
+	model.SendSpending(userId, 11, "развлечения", timeNow)
+	model.SendSpending(userId, 1, "еда", timeNow)
+	model.SendSpending(userId, 1, "еда", timeNow.AddDate(0, 0, -8))
+	model.SendSpending(userId, 1, "еда", timeNow.AddDate(0, -1, 0))
+	model.SendSpending(userId, 1, "еда", timeNow.AddDate(-1, 0, 0))
 
-	userHistory, err := model.GetUserSpendingHistory(userId)
+	totalSum, err := model.GetUserSpendingHistory(userId, Week)
 
 	assert.NoError(t, err)
-	assert.Equal(t, []spending.Spending{{Sum: 12000, SpendingType: "еда", Date: timeNow}}, userHistory)
+	assert.Equal(
+		t,
+		map[spending.SpendingType]int{
+			spending.SpendingTypeFood:          2,
+			spending.SpendingTypeEntertainment: 11,
+			spending.SpendingTypeEducation:     0,
+		},
+		totalSum,
+	)
 }
 
-func Test_GetUserSpendingHistory_Base_Get_NotFoundUser(t *testing.T) {
+func Test_GetUserSpendingHistory_Base_Get_Month(t *testing.T) {
 	model := New()
-	model.SendSpending(userId, 12000, "еда", timeNow)
+	model.SendSpending(userId, 1, "еда", timeNow)
+	model.SendSpending(userId, 1, "развлечения", timeNow)
+	model.SendSpending(userId, 1, "еда", timeNow)
+	model.SendSpending(userId, 1, "еда", timeNow.AddDate(0, 0, 8))
+	model.SendSpending(userId, 1, "еда", timeNow.AddDate(0, 1, 0))
+	model.SendSpending(userId, 1, "еда", timeNow.AddDate(1, 0, 0))
 
-	userHistory, err := model.GetUserSpendingHistory(2)
+	totalSum, err := model.GetUserSpendingHistory(userId, Week)
 
-	assert.Error(t, err)
-	assert.Equal(t, 0, len(userHistory))
+	assert.NoError(t, err)
+	assert.Equal(
+		t,
+		map[spending.SpendingType]int{
+			spending.SpendingTypeFood:          2,
+			spending.SpendingTypeEntertainment: 11,
+			spending.SpendingTypeEducation:     0,
+		},
+		totalSum,
+	)
 }

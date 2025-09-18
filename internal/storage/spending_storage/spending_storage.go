@@ -8,6 +8,14 @@ import (
 	"github.com/pkg/errors"
 )
 
+type TimePeriod string
+
+const (
+	Week  TimePeriod = "неделя"
+	Month TimePeriod = "месяц"
+	Year  TimePeriod = "год"
+)
+
 type Store struct {
 	HistorySpendingsUsers map[int64][]spending.Spending
 }
@@ -17,16 +25,48 @@ func New() *Store {
 }
 
 const (
-	notFountUser = "Пользователь с таким id не сущесвтует"
+	notFoundUser = "Пользователь с таким id не сущесвтует"
+	wrongPeriod  = "Задан не правильный период"
 )
 
-func (s *Store) GetUserSpendingHistory(userId int64, timePeriod string) ([]spending.Spending, error) {
+func (s *Store) GetUserSpendingHistory(userId int64, timePeriod TimePeriod) (map[spending.SpendingType]int, error) {
 	history, isHas := s.HistorySpendingsUsers[userId]
 	if !isHas {
-		return nil, errors.Errorf(notFountUser)
+		return nil, errors.Errorf(notFoundUser)
 	}
 
-	return history, nil
+	minDate, err := getMinDate(timePeriod)
+	if err != nil {
+		return nil, err
+	}
+
+	categoryTotalSum := map[spending.SpendingType]int{
+		spending.SpendingTypeFood:          0,
+		spending.SpendingTypeEntertainment: 0,
+		spending.SpendingTypeEducation:     0,
+	}
+	for _, val := range history {
+		if val.Date.After(minDate) {
+			categoryTotalSum[val.SpendingType] += val.Sum
+		}
+	}
+
+	return categoryTotalSum, nil
+}
+
+func getMinDate(timePeriod TimePeriod) (time.Time, error) {
+	now := time.Now()
+	minDate := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, now.Location())
+	switch timePeriod {
+	case Week:
+		return minDate.AddDate(0, 0, -7), nil
+	case Month:
+		return minDate.AddDate(0, -1, 0), nil
+	case Year:
+		return minDate.AddDate(-1, 0, 0), nil
+	default:
+		return minDate, errors.Errorf(wrongPeriod)
+	}
 }
 
 const (
@@ -34,7 +74,7 @@ const (
 	dateAfterErr = "Заданное время не может быть позже сегодняшнего числа"
 )
 
-func (s *Store) SendSpending(userId int64, sum int64, spendingType spending.SpendingType, date time.Time) error {
+func (s *Store) SendSpending(userId int64, sum int, spendingType spending.SpendingType, date time.Time) error {
 	if sum < 0 {
 		return errors.Errorf(minusSumErr)
 	}

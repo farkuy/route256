@@ -7,19 +7,19 @@ import (
 type SpendingType string
 
 const (
-	DegreeTypeBachelors SpendingType = "еда"
-	DegreeTypeMasters   SpendingType = "развлечения"
-	DegreeTypePhD       SpendingType = "учёба"
+	SpendingTypeFood          SpendingType = "еда"
+	SpendingTypeEntertainment SpendingType = "развлечения"
+	SpendingTypeEducation     SpendingType = "учёба"
 )
 
 type Spending struct {
-	Sum          int64
-	SpendingType SpendingType //сделать енум
+	Sum          int
+	SpendingType SpendingType
 	Date         time.Time
 }
 
 type SpendingAction interface {
-	SendSpending(userId int64, sum int64, spendingType SpendingType, date time.Time) error
+	SendSpending(userId int64, sum int, spendingType SpendingType, date time.Time) error
 	GetUserSpendingHistory(userId int64) (*[]Spending, error)
 }
 
