@@ -65,18 +65,47 @@ func Test_GetUserSpendingHistory_Base_Get_Month(t *testing.T) {
 	model.SendSpending(userId, 1, "еда", timeNow)
 	model.SendSpending(userId, 1, "развлечения", timeNow)
 	model.SendSpending(userId, 1, "еда", timeNow)
-	model.SendSpending(userId, 1, "еда", timeNow.AddDate(0, 0, 8))
-	model.SendSpending(userId, 1, "еда", timeNow.AddDate(0, 1, 0))
-	model.SendSpending(userId, 1, "еда", timeNow.AddDate(1, 0, 0))
+	model.SendSpending(userId, 1, "еда", timeNow.AddDate(0, 0, -8))
+	model.SendSpending(userId, 1, "еда", timeNow.AddDate(0, -1, 0))
+	model.SendSpending(userId, 1, "развлечения", timeNow.AddDate(0, -1, 0))
+	model.SendSpending(userId, 1, "развлечения", timeNow.AddDate(0, -2, 0))
+	model.SendSpending(userId, 1, "еда", timeNow.AddDate(-1, 0, 0))
 
-	totalSum, err := model.GetUserSpendingHistory(userId, Week)
+	totalSum, err := model.GetUserSpendingHistory(userId, Month)
 
 	assert.NoError(t, err)
 	assert.Equal(
 		t,
 		map[spending.SpendingType]int{
-			spending.SpendingTypeFood:          2,
-			spending.SpendingTypeEntertainment: 11,
+			spending.SpendingTypeFood:          4,
+			spending.SpendingTypeEntertainment: 2,
+			spending.SpendingTypeEducation:     0,
+		},
+		totalSum,
+	)
+}
+
+func Test_GetUserSpendingHistory_Base_Get_Year(t *testing.T) {
+	model := New()
+	model.SendSpending(userId, 1, "еда", timeNow)
+	model.SendSpending(userId, 1, "развлечения", timeNow)
+	model.SendSpending(userId, 1, "еда", timeNow)
+	model.SendSpending(userId, 1, "еда", timeNow.AddDate(0, 0, -8))
+	model.SendSpending(userId, 1, "еда", timeNow.AddDate(0, -1, 0))
+	model.SendSpending(userId, 1, "развлечения", timeNow.AddDate(0, -1, 0))
+	model.SendSpending(userId, 1, "развлечения", timeNow.AddDate(0, -2, 0))
+	model.SendSpending(userId, 1, "еда", timeNow.AddDate(-1, 0, 0))
+	model.SendSpending(userId, 1, "еда", timeNow.AddDate(-2, 0, 0))
+	model.SendSpending(userId, 1, "еда", timeNow.AddDate(-3, 0, 0))
+
+	totalSum, err := model.GetUserSpendingHistory(userId, Year)
+
+	assert.NoError(t, err)
+	assert.Equal(
+		t,
+		map[spending.SpendingType]int{
+			spending.SpendingTypeFood:          5,
+			spending.SpendingTypeEntertainment: 3,
 			spending.SpendingTypeEducation:     0,
 		},
 		totalSum,

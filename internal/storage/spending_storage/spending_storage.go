@@ -46,7 +46,7 @@ func (s *Store) GetUserSpendingHistory(userId int64, timePeriod TimePeriod) (map
 		spending.SpendingTypeEducation:     0,
 	}
 	for _, val := range history {
-		if val.Date.After(minDate) {
+		if val.Date.After(minDate) || val.Date.Equal(minDate) {
 			categoryTotalSum[val.SpendingType] += val.Sum
 		}
 	}
@@ -82,7 +82,8 @@ func (s *Store) SendSpending(userId int64, sum int, spendingType spending.Spendi
 		return errors.Errorf(dateAfterErr)
 	}
 
-	newSpending := spending.Spending{Sum: sum, SpendingType: spendingType, Date: date}
+	startDate := time.Date(date.Year(), date.Month(), date.Day(), 0, 0, 0, 0, date.Location())
+	newSpending := spending.Spending{Sum: sum, SpendingType: spendingType, Date: startDate}
 	history, isHas := s.HistorySpendingsUsers[userId]
 	if !isHas {
 		s.HistorySpendingsUsers[userId] = []spending.Spending{newSpending}

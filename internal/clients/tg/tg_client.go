@@ -2,6 +2,7 @@ package tg
 
 import (
 	"log"
+	"log/slog"
 	"route256/internal/model/messages"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
@@ -22,6 +23,7 @@ func Start(token Token) (*Client, error) {
 		return nil, errors.Wrap(err, "NewBotAPI")
 	}
 
+	slog.Info("Бот запустился")
 	return &Client{client: tgBot}, nil
 }
 
