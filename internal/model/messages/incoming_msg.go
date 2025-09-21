@@ -20,9 +20,5 @@ type Message struct {
 }
 
 func (s *Model) IncommingMessage(msg Message) error {
-	if msg.Text == "/start" {
-		return s.tgClient.SendMessage("Привет", msg.UserId)
-	}
-
-	return s.tgClient.SendMessage("Пока не знаю такой команды", msg.UserId)
+	return s.tgClient.SendMessage(msg.Text, msg.UserId)
 }

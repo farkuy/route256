@@ -46,7 +46,7 @@ func Test_GetUserSpendingHistory_Base_Get_Week(t *testing.T) {
 	model.SendSpending(userId, 1, "еда", timeNow.AddDate(0, -1, 0))
 	model.SendSpending(userId, 1, "еда", timeNow.AddDate(-1, 0, 0))
 
-	totalSum, err := model.GetUserSpendingHistory(userId, Week)
+	totalSum, err := model.GetUserSpendingHistory(userId, spending.Week)
 
 	assert.NoError(t, err)
 	assert.Equal(
@@ -71,7 +71,7 @@ func Test_GetUserSpendingHistory_Base_Get_Month(t *testing.T) {
 	model.SendSpending(userId, 1, "развлечения", timeNow.AddDate(0, -2, 0))
 	model.SendSpending(userId, 1, "еда", timeNow.AddDate(-1, 0, 0))
 
-	totalSum, err := model.GetUserSpendingHistory(userId, Month)
+	totalSum, err := model.GetUserSpendingHistory(userId, spending.Month)
 
 	assert.NoError(t, err)
 	assert.Equal(
@@ -98,7 +98,7 @@ func Test_GetUserSpendingHistory_Base_Get_Year(t *testing.T) {
 	model.SendSpending(userId, 1, "еда", timeNow.AddDate(-2, 0, 0))
 	model.SendSpending(userId, 1, "еда", timeNow.AddDate(-3, 0, 0))
 
-	totalSum, err := model.GetUserSpendingHistory(userId, Year)
+	totalSum, err := model.GetUserSpendingHistory(userId, spending.Year)
 
 	assert.NoError(t, err)
 	assert.Equal(

@@ -8,14 +8,6 @@ import (
 	"github.com/pkg/errors"
 )
 
-type TimePeriod string
-
-const (
-	Week  TimePeriod = "неделя"
-	Month TimePeriod = "месяц"
-	Year  TimePeriod = "год"
-)
-
 type Store struct {
 	HistorySpendingsUsers map[int64][]spending.Spending
 }
@@ -29,7 +21,7 @@ const (
 	wrongPeriod  = "Задан не правильный период"
 )
 
-func (s *Store) GetUserSpendingHistory(userId int64, timePeriod TimePeriod) (map[spending.SpendingType]int, error) {
+func (s *Store) GetUserSpendingHistory(userId int64, timePeriod spending.TimePeriod) (map[spending.SpendingType]int, error) {
 	history, isHas := s.HistorySpendingsUsers[userId]
 	if !isHas {
 		return nil, errors.Errorf(notFoundUser)
@@ -54,15 +46,15 @@ func (s *Store) GetUserSpendingHistory(userId int64, timePeriod TimePeriod) (map
 	return categoryTotalSum, nil
 }
 
-func getMinDate(timePeriod TimePeriod) (time.Time, error) {
+func getMinDate(timePeriod spending.TimePeriod) (time.Time, error) {
 	now := time.Now()
 	minDate := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, now.Location())
 	switch timePeriod {
-	case Week:
+	case spending.Week:
 		return minDate.AddDate(0, 0, -7), nil
-	case Month:
+	case spending.Month:
 		return minDate.AddDate(0, -1, 0), nil
-	case Year:
+	case spending.Year:
 		return minDate.AddDate(-1, 0, 0), nil
 	default:
 		return minDate, errors.Errorf(wrongPeriod)

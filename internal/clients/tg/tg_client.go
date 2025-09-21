@@ -4,6 +4,9 @@ import (
 	"log"
 	"log/slog"
 	"route256/internal/model/messages"
+	"route256/internal/model/spending"
+	"strconv"
+	"strings"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"github.com/pkg/errors"
@@ -36,7 +39,7 @@ func (c *Client) SendMessage(message string, userId int64) error {
 	return nil
 }
 
-func (c *Client) ListenUpdates(msgModel *messages.Model) {
+func (c *Client) ListenUpdates(msgModel *messages.Model, spendingModel *spending.SpendingsUsersStorage) {
 	u := tgbotapi.NewUpdate(0)
 	u.Timeout = 60
 
@@ -46,8 +49,48 @@ func (c *Client) ListenUpdates(msgModel *messages.Model) {
 		if update.Message != nil { // If we got a message
 			log.Printf("[%s] %s", update.Message.From.UserName, update.Message.Text)
 
-			err := msgModel.IncommingMessage(messages.Message{
-				Text:   update.Message.Text,
+			reqText := update.Message.Text
+			resTextMessage := ""
+			var err error
+
+			//TODO переписать ублюдство с рабиением этого на отдельные сегменты
+			switch {
+			case strings.HasPrefix(reqText, "/start"):
+				resTextMessage = "Привет"
+			case strings.HasPrefix(reqText, "/addSum"):
+				spendingData, err := spending.ParseSendSpendingComand(reqText)
+				if err != nil {
+					resTextMessage = err.Error()
+					break
+				}
+				err = spendingModel.Store.SendSpending(update.Message.From.ID, spendingData.Sum, spendingData.SpendingType, spendingData.Date)
+				if err != nil {
+					resTextMessage = err.Error()
+					break
+				}
+				resTextMessage = "Трата добавлена"
+			case strings.HasPrefix(reqText, "/getSpending"):
+				period, err := spending.ParseGetUserSpendingHistory(reqText)
+				if err != nil {
+					resTextMessage = err.Error()
+					break
+				}
+				data, err := spendingModel.Store.GetUserSpendingHistory(update.Message.From.ID, spending.TimePeriod(period))
+				if err != nil {
+					resTextMessage = err.Error()
+					break
+				}
+				resTextMessage = "За " + period + " вы потратили на "
+				for key, val := range data {
+					sum := strconv.Itoa(val)
+					resTextMessage += string(key) + " : " + sum + "; "
+				}
+			default:
+				resTextMessage = "Я пока еще не знаю такую команду "
+			}
+
+			err = msgModel.IncommingMessage(messages.Message{
+				Text:   resTextMessage,
 				UserId: update.Message.From.ID,
 			})
 			if err != nil {
