@@ -1,10 +1,10 @@
 package tg
 
 import (
-	"log"
-	"log/slog"
+	"fmt"
 	"route256/internal/model/messages"
 	"route256/internal/model/spending"
+	flogger "route256/pkg/logger"
 	"strconv"
 	"strings"
 
@@ -26,7 +26,7 @@ func Start(token Token) (*Client, error) {
 		return nil, errors.Wrap(err, "NewBotAPI")
 	}
 
-	slog.Info("Бот запустился")
+	flogger.Info("Бот запустился")
 	return &Client{client: tgBot}, nil
 }
 
@@ -47,13 +47,13 @@ func (c *Client) ListenUpdates(msgModel *messages.Model, spendingModel *spending
 
 	for update := range updates {
 		if update.Message != nil { // If we got a message
-			log.Printf("[%s] %s", update.Message.From.UserName, update.Message.Text)
+			flogger.Info(fmt.Sprintf("[%s] %s", update.Message.From.UserName, update.Message.Text))
 
 			reqText := update.Message.Text
 			resTextMessage := ""
 			var err error
 
-			//TODO переписать ублюдство с рабиением этого на отдельные сегменты
+			//TODO переписать ублюдство с разбиением этого на отдельные сегменты
 			switch {
 			case strings.HasPrefix(reqText, "/start"):
 				resTextMessage = "Привет"

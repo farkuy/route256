@@ -1,23 +1,21 @@
-package logger_custome
+package flogger
 
 import (
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
-func Test_Log_Info(t *testing.T) {
-	logger := New(Info)
+func Test_GetColor(t *testing.T) {
+	red := getColorLog(ErrorLvl)
+	assert.Equal(t, red, Red)
 
-	logger.Info("Не розовый текст")
-}
+	yellow := getColorLog(WarnLvl)
+	assert.Equal(t, yellow, Yellow)
 
-func Test_Log_Warn(t *testing.T) {
-	logger := New(Info)
+	white := getColorLog(InfoLvl)
+	assert.Equal(t, white, White)
 
-	logger.Warn("Не розовый текст")
-}
-
-func Test_Log_Error(t *testing.T) {
-	logger := New(Info)
-
-	logger.Error("Не розовый текст")
+	gray := getColorLog("")
+	assert.Equal(t, gray, Gray)
 }

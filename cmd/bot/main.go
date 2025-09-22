@@ -1,7 +1,6 @@
 package main
 
 import (
-	"log"
 	"route256/config"
 	"route256/internal/clients/tg"
 	"route256/internal/model/messages"
@@ -12,12 +11,12 @@ import (
 func main() {
 	config, err := config.New()
 	if err != nil {
-		log.Fatal(err)
+		//logger_custome.Logger.Fatal(err)
 	}
 
 	tgClient, err := tg.Start(config)
 	if err != nil {
-		log.Fatal(err)
+		//logger_custome.Logger.Fatal(err)
 	}
 
 	spendingStore := spending_storage.New()

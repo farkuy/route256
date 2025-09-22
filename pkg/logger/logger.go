@@ -1,42 +1,80 @@
-package logger_custome
+package flogger
 
 import (
 	"fmt"
+	"os"
+	"os/signal"
+	"syscall"
 	"time"
 )
 
-type LogLevel string
-
-const (
-	Debug LogLevel = "debug"
-	Info  LogLevel = "info"
-	Warn  LogLevel = "warn"
-	Error LogLevel = "error"
-	Fatal LogLevel = "fatal"
-)
+type LogStruct struct {
+	text  string
+	level LogLevel
+	time  string
+}
 
 type Model struct {
-	Level LogLevel
-	logCh chan string
+	logCh chan LogStruct
 }
 
-func New(level LogLevel) *Model {
-	return &Model{Level: level, logCh: make(chan string)}
+func new() *Model {
+
+	stopChan := make(chan os.Signal, 1)
+	signal.Notify(stopChan, syscall.SIGINT, syscall.SIGTERM)
+
+	model := &Model{logCh: make(chan LogStruct, 100)}
+	defer close(model.logCh)
+
+	go func() {
+
+		for {
+			select {
+			case logData, ok := <-model.logCh:
+				if !ok {
+					fmt.Println("закртыие в logData case")
+					return
+				}
+
+				color := getColorLog(logData.level)
+				fmt.Printf("%v %v%v%v: %v \n", logData.time, color, logData.level, Reset, logData.text)
+			case <-stopChan:
+				fmt.Println("закртыие в stopChan case")
+				return
+			}
+		}
+	}()
+
+	return model
 }
 
-func (m *Model) TimeNow() time.Time {
-	return time.Now()
+var logger *Model = new()
+
+func timeNow() string {
+	return time.Now().Format("02-01-2006 15:04:05")
 }
 
-func (m *Model) Info(text string) {
-	fmt.Printf("%vINFO%v: %v", Blue, Reset, text)
+func Info(text string) {
+	logger.logCh <- LogStruct{text, InfoLvl, timeNow()}
 }
 
-func (m *Model) Warn(text string) {
-	fmt.Printf("%vWARN%v: %v", Yellow, Reset, text)
+func Warn(text string) {
+	logger.logCh <- LogStruct{text, WarnLvl, timeNow()}
 }
 
-func (m *Model) Error(text string) {
-	fmt.Printf("%vERROR%v: %v", Red, Reset, text)
+func Error(text string) {
+	logger.logCh <- LogStruct{text, ErrorLvl, timeNow()}
+}
 
+func getColorLog(lvl LogLevel) LoggerColor {
+	switch lvl {
+	case InfoLvl:
+		return Blue
+	case WarnLvl:
+		return Yellow
+	case ErrorLvl:
+		return Red
+	default:
+		return Gray
+	}
 }
